@@ -21,7 +21,7 @@ $(document).ready(function(){
     var password = $("#password");
 
     login.click(function(){
-        $.getJSON(path + "/login" + "?username=" + encodeURI(username.val()) + "&password=" + encodeURI(password.val()),
+        $.getJSON(path + "/login/spring" + "?username=" + encodeURI(username.val()) + "&password=" + encodeURI(password.val()),
         function(data){
             alert(JSON.stringify(data));
             if(data.username !== "") {

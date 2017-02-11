@@ -19,7 +19,7 @@ $(document).ready(function(){
     // Inputs
     var username = $("#username");
     var password = $("#password");
-
+    
     login.click(function(){
         $.getJSON(path + "/login" + "?username=" + encodeURI(username.val()) + "&password=" + encodeURI(password.val()),
         function(data){
