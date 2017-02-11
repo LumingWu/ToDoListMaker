@@ -20,8 +20,27 @@ import com.google.appengine.api.users.UserServiceFactory;
 @Controller
 public class GuestbookController {
 	@RequestMapping("/")
-	public String home() {
-		return "guestbook";
+	public ModelAndView home() {
+		// Get user
+		UserService userService = UserServiceFactory.getUserService();
+		User currentUser = userService.getCurrentUser();
+		// Login or empty
+		//if(currentUser == null){
+
+		//}
+		//else{
+			// Static testing user
+			ModelAndView mav = new ModelAndView("ToDoListMaker");
+			mav.getModelMap().addAttribute("username", "John");
+		//}
+
+		return mav;
+	}
+
+	@RequestMapping("/logout")
+	public void logout() {
+		// Log out
+
 	}
 
 	@RequestMapping("/loggedIn")
