@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -24,37 +25,55 @@ public class GuestbookController {
 		// Get user
 		UserService userService = UserServiceFactory.getUserService();
 		User currentUser = userService.getCurrentUser();
+		currentUser = null;
+		ModelAndView mav = new ModelAndView("ToDoListMaker");
 		// Login or empty
-		//if(currentUser == null){
-
-		//}
-		//else{
+		if(currentUser == null){
+			mav.getModelMap().addAttribute("username", "");
+		}
+		else{
 			// Static testing user
-			ModelAndView mav = new ModelAndView("ToDoListMaker");
 			mav.getModelMap().addAttribute("username", "John");
-		//}
+		}
 
 		return mav;
 	}
 
 	@RequestMapping("/logout")
 	public void logout() {
-		// Log out
-
-	}
-
-	@RequestMapping("/loggedIn")
-	public ModelAndView listGuestbook() {
 		UserService userService = UserServiceFactory.getUserService();
 		User currentUser = userService.getCurrentUser();
 
-		if (currentUser == null) {
-			return new ModelAndView("redirect:"
-					+ userService.createLoginURL("/"));
-		} else {
-			return new ModelAndView("guestbook", "welcomeMsg", "You are authenticated, "
-					+ currentUser.getNickname());
-		}
+	}
+
+	@RequestMapping("/login")
+	@ResponseBody
+	public String listGuestbook(
+			@RequestParam(value = "username") String username,
+			@RequestParam(value = "password") String password
+	) {
+		// Confirm the data is correct
+		User currentUser = null;
+
+		return "{'username':'John'," +
+				"'publictodolist':[" +
+				"	{'name':'ToDo1', 'owner':'John'}," +
+				"	{'name':'ToDo2', 'owner':'Daniel'}" +
+				"	]," +
+				"'privatetodolist':[" +
+				"	{'name':'ToDo3', 'owner':'John'}," +
+				"	{'name':'ToDo4', 'owner':'John'}" +
+				"	]" +
+				"}";
+	}
+
+	@RequestMapping(value = "/register", produces="text/plain")
+	@ResponseBody
+	public String register(
+			@RequestParam(value = "username") String username,
+			@RequestParam(value = "password") String password
+	){
+		return "ok";
 	}
 
 	@RequestMapping("/sign")

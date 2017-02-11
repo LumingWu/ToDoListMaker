@@ -12,18 +12,20 @@ Editor: Luming Wu
     <link rel="icon" type="image/ico" href="images/favicon.ico">
 </head>
 <body>
+<div class="box" id="userstatus">
 <c:choose>
     <c:when test="${username == ''}">
         <input type="text" name="username" placeholder="username" id="username">
         <input type="text" name="password" placeholder="password" id="password">
-        <button onclick="login()">Login</button>
-        <button onclick="register()">Register</button>
+        <button id="login">Login</button>
+        <button id="register">Register</button>
     </c:when>
     <c:otherwise>
         <span class="title2">Welcome, ${username}!</span>
-        <button onclick="logout()"><img src="images/Exit.png" alt="Exit"></button>
+        <button id="logout"><img src="images/Exit.png" alt="Exit"></button>
     </c:otherwise>
 </c:choose>
+</div>
 <div class="box">
     <span class="title">To Do List</span>
     <div class="spacing10"></div>
@@ -35,7 +37,7 @@ Editor: Luming Wu
         <button onclick="MovePublicToDoListUp"><img src="images/MoveUp.png" alt="MoveUp"></button>
         <button onclick="MovePublicToDoListDown"><img src="images/MoveDown.png" alt="MoveDown"></button>
         <div class="spacing10"></div>
-        <table>
+        <table id="public">
             <tr>
                 <td>Name</td>
                 <td>Owner</td>
@@ -48,7 +50,7 @@ Editor: Luming Wu
         <button onclick="MovePrivateToDoListUp"><img src="images/MoveUp.png" alt="MoveUp"></button>
         <button onclick="MovePrivateToDoListDown"><img src="images/MoveDown.png" alt="MoveDown"></button>
         <div class="spacing10"></div>
-        <table>
+        <table id="private">
             <tr>
                 <td>Name</td>
                 <td>Owner</td>
@@ -64,7 +66,7 @@ Editor: Luming Wu
         <button onclick="MoveToDoUp"><img src="images/MoveUp.png" alt="MoveUp"></button>
         <button onclick="MoveToDoDown"><img src="images/MoveDown.png" alt="MoveDown"></button>
         <div class="spacing10"></div>
-        <table>
+        <table id="todolist">
             <tr>
                 <td>Category</td>
                 <td>Description</td>
