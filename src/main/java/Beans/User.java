@@ -1,13 +1,13 @@
 package Beans;
 
-import com.google.appengine.api.datastore.Entity;
+import java.io.Serializable;
 
 /**
  * Editor: Luming Wu
  */
-public class User {
+public class User implements Serializable{
 
-    private String index;
+    private String key;
     private String username;
     private String password;
 
@@ -15,12 +15,12 @@ public class User {
 
     }
 
-    public String getIndex(){
-        return index;
+    public String getKey(){
+        return key;
     }
 
-    public void setIndex(String i){
-        index = i;
+    public void setKey(String i){
+        key = i;
     }
 
     public String getUsername(){
@@ -37,17 +37,6 @@ public class User {
 
     public void setPassword(String p){
         password = p;
-    }
-
-    public void fromEntity(Entity e){
-
-    }
-
-    public Entity toEntity(){
-        Entity e = new Entity("User");
-        e.setProperty("username", username);
-        e.setProperty("password", password);
-        return e;
     }
 
 }

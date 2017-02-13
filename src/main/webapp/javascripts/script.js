@@ -2,52 +2,84 @@
  * Editor: Luming Wu
  */
 $(document).ready(function(){
-
-    var path = window.location.pathname;
+    
+    var getUrl = window.location;
+    var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
 
     // HTML change require
     var userstatus = $("#userstatus");
     var public = $("#public");
     var private = $("#private");
     var todolist = $("#todolist");
-
-    // Buttons
-    var login = $("#login");
-    var register = $("#register");
-    var logout = $("#logout");
-
-    // Inputs
-    var username = $("#username");
-    var password = $("#password");
-
-    login.click(function(){
-        $.getJSON(path + "/login/spring" + "?username=" + encodeURI(username.val()) + "&password=" + encodeURI(password.val()),
-        function(data){
-            alert(JSON.stringify(data));
-            if(data.username !== "") {
-                userstatus.html("<span class='title2'>Welcome, data.username</span>" +
-                    "<button onclick='logout()'><img src='images/Exit.png' alt='Exit'></button>");
-                for(var obj in data.publictodolist){
-                    public.append("<tr><td>" + obj.name + "</td><td>" + obj.owner + "</td></tr>");
-                }
-                for(var obj in data.privatetodolist){
-                    private .append("<tr><td>" + obj.name + "</td><td>" + obj.owner + "</td></tr>");
-                }
-
-            }
+    
+    // Object subject to change
+    var selectedpublictdl = null;
+    var selectedprivatetdl = null;
+    var selectedtd = null;
+    
+    // Set table to be sortable
+    $("table").tablesorter({
+        sortReset   : true,
+        sortRestart : true
+    });
+    
+    // Set table column arrows
+    $("thead tr td").click(function(){
+        var columnname = $(this).text();
+        switch(columnname.charAt(columnname.length - 1)){
+            case "-":
+                $(this).text(columnname.substring(0, columnname.length - 1) + "^");
+                break;
+            case "^":
+                $(this).text(columnname.substring(0, columnname.length - 1) + "v");
+                break;
+            case "v":
+                $(this).text(columnname.substring(0, columnname.length - 1) + "-");
+                break;
+        }
+    });
+    
+    // Set row to move up
+    $("#public tr").click(function(){
+        selectedpublictdl = $(this);
+        $.ajax({
+        type:"GET",
+        url: "/viewtodolist?type=public&index=" + $(this).children().eq(2).val(),
+        dataType: "html",
+        contentType: "text/html;charset=utf-8",
+        success: function(data){
+            todolist.first().html(data);
+        }
         });
     });
-
-    register.click(function(){
-        $.post("register");
+    
+    $("#private tr").click(function(){
+        selectedprivatetdl = $(this);
+        $.ajax({
+        type:"GET",
+        url: "/viewtodolist?type=private&index=" + $(this).children().eq(2).val(),
+        dataType: "html",
+        contentType: "text/html;charset=utf-8",
+        success: function(data){
+            todolist.first().html(data);
+        }
+        });
     });
-
-    logout.click(function(){
-        $.load(path + '/logout');
-        userstatus.html("<input type='text' name='username' placeholder='username' id='username'>" +
-            "<input type='text' name='password' placeholder='password' id='password'>" +
-            "<button onclick='login()'>Login</button>" +
-            "<button onclick='register()'>Register</button>");
+    
+    $("#MovePublicToDoListUp").click(function(){
+        selectedpublictdl.prev().insertAfter(selectedpublictdl);
     });
-
+    
+    $("#MovePrivateToDoListUp").click(function(){
+        selectedprivatetdl.prev().insertAfter(selectedprivatetdl);
+    });
+    
+    $("#MovePublicToDoListDown").click(function(){
+        selectedpublictdl.next().insertBefore(selectedpublictdl);
+    });
+    
+    $("#MovePrivateToDoListDown").click(function(){
+        selectedprivatetdl.next().insertBefore(selectedprivatetdl);
+    });
+    
 });
