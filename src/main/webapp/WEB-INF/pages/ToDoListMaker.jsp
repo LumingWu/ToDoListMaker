@@ -52,6 +52,7 @@
                         </c:if>
                     </tbody>
                 </table>
+                <div class="spacing10"></div>
                 <span class="title2">Private</span><br>
                 <div class="spacing10"></div>
                 <button id="AddPrivateToDoList"><img src="images/Add.png" alt="Add"></button>

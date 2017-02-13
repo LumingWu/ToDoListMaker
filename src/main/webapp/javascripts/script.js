@@ -1,5 +1,7 @@
 /**
  * Editor: Luming Wu
+ * 
+ * ctrl + shift + r to update script file. Chrome is giving hard time.
  */
 $(document).ready(function(){
     
@@ -25,6 +27,9 @@ $(document).ready(function(){
     
     // Set table column arrows
     $("thead tr td").click(function(){
+        var th = $(this).closest("th");
+        th.prop("data-sorter", "true");
+        console.log(th.html());
         var columnname = $(this).text();
         switch(columnname.charAt(columnname.length - 1)){
             case "-":
@@ -39,7 +44,7 @@ $(document).ready(function(){
         }
     });
     
-    // Set row to move up
+    // Set viewing todolist
     $("#public tr").click(function(){
         selectedpublictdl = $(this);
         $.ajax({
@@ -49,6 +54,10 @@ $(document).ready(function(){
         contentType: "text/html;charset=utf-8",
         success: function(data){
             todolist.first().html(data);
+            todolist.closest("table").trigger("update");
+            todolist.children("tr").click(function(){
+                selectedtd = $(this);
+            });
         }
         });
     });
@@ -62,24 +71,113 @@ $(document).ready(function(){
         contentType: "text/html;charset=utf-8",
         success: function(data){
             todolist.first().html(data);
+            todolist.closest("table").trigger("update");
+            todolist.children("tr").click(function(){
+                selectedtd = $(this);
+            });
         }
         });
     });
     
+    // Set row to move up
     $("#MovePublicToDoListUp").click(function(){
-        selectedpublictdl.prev().insertAfter(selectedpublictdl);
+        if(selectedpublictdl !== null){
+            var th = $(this).closest("th");
+            th.prop("data-sorter", "false");
+            selectedpublictdl.prev().insertAfter(selectedpublictdl);
+        }
     });
     
     $("#MovePrivateToDoListUp").click(function(){
-        selectedprivatetdl.prev().insertAfter(selectedprivatetdl);
+        if(selectedprivatetdl !== null){
+            var th = $(this).closest("th");
+            th.prop("data-sorter", "false");
+            selectedprivatetdl.prev().insertAfter(selectedprivatetdl);
+        }
     });
     
     $("#MovePublicToDoListDown").click(function(){
-        selectedpublictdl.next().insertBefore(selectedpublictdl);
+        if(selectedpublictdl !== null){
+            var th = $(this).closest("th");
+            th.prop("data-sorter", "false");
+            selectedpublictdl.next().insertBefore(selectedpublictdl);
+        }
     });
     
     $("#MovePrivateToDoListDown").click(function(){
-        selectedprivatetdl.next().insertBefore(selectedprivatetdl);
+        if(selectedprivatetdl !== null){
+            var th = $(this).closest("th");
+            th.prop("data-sorter", "false");
+            selectedprivatetdl.next().insertBefore(selectedprivatetdl);
+        }
+    });
+    
+    $("#MoveToDoUp").click(function(){
+        if(selectedtd !== null){
+            var th = $(this).closest("th");
+            th.prop("data-sorter", "false");
+            selectedtd.next().insertBefore(selectedtd);
+        }
+    });
+    
+    $("#MoveToDoDown").click(function(){
+        if(selectedtd !== null){
+            var th = $(this).closest("th");
+            th.prop("data-sorter", "false");
+            selectedtd.next().insertBefore(selectedtd);
+        }
+    });
+    
+    $("#RemovePublicToDoList").click(function(){
+        $.get("/deletetodolist?type=public&index=" + selectedpublictdl.children().eq(2).val(), function(data){
+            if(data !== ""){
+                selectedpublictdl.remove();
+                selectedpublictdl = null;
+            }
+        });
+    });
+    
+    $("#RemovePrivateToDoList").click(function(){
+        $.get("/deletetodolist?type=private&index=" + selectedprivatetdl.children().eq(2).val(), function(data){
+            if(data !== ""){
+                selectedprivatetdl.remove();
+                selectedprivatetdl = null;
+            }
+        });
+    });
+    
+    $("#AddPublicToDoList").click(function(){
+        $.get("/addtodolist?type=public", function(data){
+            if(data !== ""){
+                public.append(
+                    "<tr>"
+                    + "<td>EMPTY</td>"
+                    + "<td>EMPTY</td>"
+                    + "<input type='hidden' value='" + data + "'>"
+                    + "</tr>");
+            }
+        });
+    });
+    
+    $("#AddPrivateToDoList").click(function(){
+        $.get("/addtodolist?type=private", function(data){
+            if(data !== ""){
+                private.append(
+                    "<tr>"
+                    + "<td>EMPTY</td>"
+                    + "<td>EMPTY</td>"
+                    + "<input type='hidden' value='" + data + "'>"
+                    + "</tr>");
+            }
+        });
+    });
+    
+    $("#RemoveToDo").click(function(){
+        
+    });
+    
+    $("#AddToDo").click(function(){
+        
     });
     
 });

@@ -20,8 +20,11 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import javax.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
+@SessionAttributes({"user", "loginstatus", "public", "private", "todos"})
 public class GuestbookController {
 
     @RequestMapping("/")
@@ -55,7 +58,7 @@ public class GuestbookController {
             tdl4.setName("ToDoList4");
             tdl3.setOwner("John");
             tdl4.setOwner("John");
-            ToDoList[] privatetdls = new ToDoList[]{tdl3, tdl2};
+            ToDoList[] privatetdls = new ToDoList[]{tdl3, tdl4};
             mav.getModelMap().addAttribute("private", privatetdls);
         }
         return mav;
@@ -67,7 +70,7 @@ public class GuestbookController {
         return "redirect:/";
     }
     
-    @RequestMapping(value = "/viewtodolist")
+    @RequestMapping(value="/viewtodolist", produces="text/html")
     @ResponseBody
     public String gettodolist(
             @RequestParam("type") String type,
@@ -88,7 +91,39 @@ public class GuestbookController {
         td2.setComplete("true");
         ToDo[] todos = new ToDo[]{td1, td2};
         mav.getModelMap().addAttribute("todos", todos);
-        return "<tr><td>123</td></tr>";
+        String html = "";
+        for(int i = 0; i < todos.length; i++){
+            html =  html + "<tr>"
+                    + "<td>" + todos[i].getCategory() + "</td>"
+                    + "<td>" + todos[i].getDescription() + "</td>"
+                    + "<td>" + todos[i].getStartDate() + "</td>"
+                    + "<td>" + todos[i].getEndDate() + "</td>"
+                    + "<td>" + todos[i].getComplete() + "</td>"
+                    + "<input type='hidden' value='" + i + "'>"
+                    + "</tr>";
+        }
+        return html;
+    }
+    
+    @RequestMapping(value="/deletetodolist", produces="text/html")
+    @ResponseBody
+    public String deletetodolist(
+            @ModelAttribute("public") ToDoList[] publictdl,
+            @ModelAttribute("private") ToDoList[] privatetdl,
+            @RequestParam("type") String type,
+            @RequestParam("index") int index){
+        // Return '' if failed, ok if success.
+        return "ok";
+    }
+    
+    @RequestMapping(value="/addtodolist", produces="text/html")
+    @ResponseBody
+    public String addtodolist(
+            @ModelAttribute("public") ToDoList[] publictdl,
+            @ModelAttribute("private") ToDoList[] privatetdl,
+            @RequestParam("type") String type){
+        //Return '' if failed, index if success.
+        return "3";
     }
     
     @RequestMapping("/sign")
