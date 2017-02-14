@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -19,29 +18,29 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import java.util.Arrays;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
-@SessionAttributes({"user", "loginstatus", "public", "private", "todos"})
 public class GuestbookController {
 
     @RequestMapping("/")
-    public ModelAndView home() {
+    public String home(HttpServletRequest request) {
         // Get user
         UserService userService = UserServiceFactory.getUserService();
         User currentUser = userService.getCurrentUser();
-        ModelAndView mav = new ModelAndView("ToDoListMaker");
+        HttpSession session = request.getSession();
         // Login or empty
         if (currentUser == null) {
-            mav.getModelMap().addAttribute("loginstatus", false);
-            mav.getModelMap().addAttribute("authurl", userService.createLoginURL("/"));
+            session.setAttribute("loginstatus", false);
+            session.setAttribute("authurl", userService.createLoginURL("/"));
         } else {
             // Load Head
-            mav.getModelMap().addAttribute("user", currentUser);
-            mav.getModelMap().addAttribute("loginstatus", true);
-            mav.getModelMap().addAttribute("authurl", userService.createLogoutURL("/logout"));
+            session.setAttribute("user", currentUser);
+            session.setAttribute("loginstatus", true);
+            session.setAttribute("authurl", userService.createLogoutURL("/logout"));
             // Load Public ToDoLists
             ToDoList tdl1 = new ToDoList();
             ToDoList tdl2 = new ToDoList();
@@ -49,8 +48,10 @@ public class GuestbookController {
             tdl2.setName("ToDoList2");
             tdl1.setOwner("John");
             tdl2.setOwner("Daniel");
+            tdl1.setEditable("true");
+            tdl2.setEditable("true");
             ToDoList[] publictdls = new ToDoList[]{tdl1, tdl2};
-            mav.getModelMap().addAttribute("public", publictdls);
+            session.setAttribute("public", publictdls);
             // Load Private ToDoLists
             ToDoList tdl3 = new ToDoList();
             ToDoList tdl4 = new ToDoList();
@@ -58,10 +59,12 @@ public class GuestbookController {
             tdl4.setName("ToDoList4");
             tdl3.setOwner("John");
             tdl4.setOwner("John");
+            tdl3.setEditable("true");
+            tdl4.setEditable("true");
             ToDoList[] privatetdls = new ToDoList[]{tdl3, tdl4};
-            mav.getModelMap().addAttribute("private", privatetdls);
+            session.setAttribute("private", privatetdls);
         }
-        return mav;
+        return "ToDoListMaker";
     }
     
     @RequestMapping("/logout")
@@ -74,9 +77,8 @@ public class GuestbookController {
     @ResponseBody
     public String gettodolist(
             @RequestParam("type") String type,
-            @RequestParam("index") int index
-            ){
-        ModelAndView mav = new ModelAndView("ToDoList");
+            @RequestParam("index") int index,
+            HttpSession session){
         ToDo td1 = new ToDo();
         td1.setCategory("Sample1");
         td1.setDescription("Sample2");
@@ -90,7 +92,7 @@ public class GuestbookController {
         td2.setEndDate("Sample8");
         td2.setComplete("true");
         ToDo[] todos = new ToDo[]{td1, td2};
-        mav.getModelMap().addAttribute("todos", todos);
+        session.setAttribute("todos", todos);
         String html = "";
         for(int i = 0; i < todos.length; i++){
             html =  html + "<tr>"
@@ -104,69 +106,148 @@ public class GuestbookController {
         }
         return html;
     }
-    
+    // Return '' if failed, ok if success.
     @RequestMapping(value="/deletetodolist", produces="text/plain")
     @ResponseBody
     public String deletetodolist(
-            @ModelAttribute("public") ToDoList[] publictdl,
-            @ModelAttribute("private") ToDoList[] privatetdl,
             @RequestParam("type") String type,
-            @RequestParam("index") int index){
-        // Return '' if failed, ok if success.
+            @RequestParam("index") int index,
+            HttpSession session){
+        ToDoList[] publictdl = (ToDoList[])session.getAttribute("public");
+        ToDoList[] privatetdl = (ToDoList[])session.getAttribute("private");
+        /* need to change later */
         return "ok";
     }
-    
+    //Return '' if failed, index if success.
     @RequestMapping(value="/addtodolist", produces="text/plain")
     @ResponseBody
     public String addtodolist(
-            @ModelAttribute("public") ToDoList[] publictdl,
-            @ModelAttribute("private") ToDoList[] privatetdl,
-            @RequestParam("type") String type){
-        //Return '' if failed, index if success.
-        return "3";
+            @RequestParam("type") String type,
+            HttpSession session){
+        ToDoList[] publictdl = (ToDoList[])session.getAttribute("public");
+        ToDoList[] privatetdl = (ToDoList[])session.getAttribute("private");
+        // Get user
+        UserService userService = UserServiceFactory.getUserService();
+        User user = userService.getCurrentUser();
+        // Get datastore
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        // Create todolist
+        ToDoList tdl = new ToDoList();
+        tdl.setName("");
+        tdl.setOwner(user.getNickname());
+        tdl.setEditable("true");
+        tdl.setUserEmail(user.getEmail());
+        // Check public or private
+        int length = 0;
+        if(type.equals("public")){
+            ToDoList[] newlist = Arrays.copyOf(publictdl, publictdl.length + 1);
+            length = newlist.length;
+            tdl.setType("public");
+            newlist[length - 1] = tdl;
+            session.setAttribute("public", newlist);
+        }
+        if(type.equals("private")){
+            ToDoList[] newlist = Arrays.copyOf(publictdl, privatetdl.length + 1);
+            length = newlist.length;
+            tdl.setType("private");
+            newlist[length - 1] = tdl;
+            session.setAttribute("private", newlist);
+        }
+        Entity todolist = new Entity("ToDoList");
+        todolist.setProperty("name", tdl.getName());
+        todolist.setProperty("owner", tdl.getOwner());
+        todolist.setProperty("type", tdl.getType());
+        todolist.setProperty("useremail", tdl.getUserEmail());
+        datastore.put(todolist);
+        /* need to change later */
+        return "" + length;
     }
-    
+    //Return '' if failed, index if success.
     @RequestMapping(value="/addtodo", produces="text/plain")
     @ResponseBody
     public String addtodo(
-            @ModelAttribute("public") ToDoList[] publictdl,
-            @ModelAttribute("private") ToDoList[] privatetdl,
             @RequestParam("type") String type,
-            @RequestParam("index") int index){
-        return "3";
+            @RequestParam("index") int index,
+            HttpSession session){
+        ToDoList[] publictdl = (ToDoList[])session.getAttribute("public");
+        ToDoList[] privatetdl = (ToDoList[])session.getAttribute("private");
+        ToDo[] todos = (ToDo[])session.getAttribute("todos");
+        // Get user
+        UserService userService = UserServiceFactory.getUserService();
+        User user = userService.getCurrentUser();
+        // Get datastore
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        // Create todo
+        ToDo td = new ToDo();
+        td.setCategory("");
+        td.setDescription("");
+        td.setStartDate("");
+        td.setEndDate("");
+        td.setComplete("");
+        // Fill ToDoList key
+        if(type.equals("public") && publictdl[index].getEditable().equals("true")){
+            td.setToDoListKey(publictdl[index].getKey());
+        }
+        else if(type.equals("private") && privatetdl[index].getEditable().equals("true")){
+            td.setToDoListKey(privatetdl[index].getKey());
+        }
+        else{
+            return "";
+        }
+        // Renew the todolist
+        ToDo[] newlist = Arrays.copyOf(todos, todos.length + 1);
+        newlist[newlist.length - 1] = td;
+        session.setAttribute("todos", newlist);
+        // Create Entity
+        Entity todo = new Entity("ToDo");
+        todo.setProperty("category", td.getCategory());
+        todo.setProperty("description", td.getDescription());
+        todo.setProperty("startdate", td.getStartDate());
+        todo.setProperty("enddate", td.getEndDate());
+        todo.setProperty("complete", td.getComplete());
+        todo.setProperty("todolistkey", td.getToDoListKey());
+        /* need to change later */
+        return "" + newlist.length;
     }
-    
+    // Return '' if failed, ok if success.
     @RequestMapping(value="/deletetodo", produces="text/plain")
     @ResponseBody
     public String deletetodo(
-            @ModelAttribute("public") ToDoList[] publictdl,
-            @ModelAttribute("private") ToDoList[] privatetdl,
             @RequestParam("type") String type,
             @RequestParam("index") int index,
-            @RequestParam("index2") int index2){
+            @RequestParam("index2") int index2,
+            HttpSession session){
+        ToDoList[] publictdl = (ToDoList[])session.getAttribute("public");
+        ToDoList[] privatetdl = (ToDoList[])session.getAttribute("private");
+        /* need to change later */
         return "ok";
     }
     
-    @RequestMapping("/sign")
-    public String signGuestbook(
-            @RequestParam(required = true, value = "guestbookName") String guestbookName,
-            @RequestParam(required = true, value = "content") String content,
-            Model model) {
-        UserService userService = UserServiceFactory.getUserService();
-        User user = userService.getCurrentUser();
-
-        Key guestbookKey = KeyFactory.createKey("Guestbook", guestbookName);
-        Date date = new Date();
-        Entity greeting = new Entity("Greeting", guestbookKey);
-        greeting.setProperty("user", user);
-        greeting.setProperty("date", date);
-        greeting.setProperty("content", content);
-
-        DatastoreService datastore = DatastoreServiceFactory
-                .getDatastoreService();
-        datastore.put(greeting);
-
-        model.addAttribute("guestbookName", guestbookName);
-        return "guestbook";
+    @RequestMapping(value="/modifytodolist", produces="text/plain")
+    @ResponseBody
+    public String modifytodolist(
+            @RequestParam("type") String type,
+            @RequestParam("index") int index,
+            HttpSession session
+        ){
+        ToDoList[] publictdl = (ToDoList[])session.getAttribute("public");
+        ToDoList[] privatetdl = (ToDoList[])session.getAttribute("private");
+        
+        return "ok";
     }
+    
+    @RequestMapping(value="/modifytodo", produces="text/plain")
+    @ResponseBody
+    public String modifytodo(
+            @RequestParam("type") String type,
+            @RequestParam("index") int index,
+            @RequestParam("index2") int index2,
+            HttpSession session
+        ){
+        ToDoList[] publictdl = (ToDoList[])session.getAttribute("public");
+        ToDoList[] privatetdl = (ToDoList[])session.getAttribute("private");
+        
+        return "ok";
+    }
+    
 }

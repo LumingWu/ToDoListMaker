@@ -14,6 +14,7 @@ public class ToDo implements Serializable {
     private String startdate;
     private String enddate;
     private String complete;
+    private String todolistkey;
     
     public ToDo() {
         
@@ -65,6 +66,14 @@ public class ToDo implements Serializable {
     
     public void setComplete(String c){
         complete = c;
+    }
+    
+    public String getToDoListKey(){
+        return todolistkey;
+    }
+    
+    public void setToDoListKey(String t){
+        todolistkey = t;
     }
     
 }

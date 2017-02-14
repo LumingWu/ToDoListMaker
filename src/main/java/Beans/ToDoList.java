@@ -12,6 +12,7 @@ public class ToDoList implements Serializable {
     private String owner;
     private String type;
     private String editable;
+    private String useremail;
     
     public ToDoList() {
         
@@ -55,6 +56,14 @@ public class ToDoList implements Serializable {
     
     public void setEditable(String e){
         editable = e;
+    }
+    
+    public String getUserEmail(){
+        return useremail;
+    }
+    
+    public void setUserEmail(String u){
+        useremail = u;
     }
     
 }
