@@ -19,6 +19,9 @@ $(document).ready(function(){
     var selectedprivatetdl = null;
     var selectedtd = null;
     
+    // State of the selection
+    var selecttype = null;
+    
     // Set table to be sortable
     $("table").tablesorter({
         sortReset   : true,
@@ -47,6 +50,8 @@ $(document).ready(function(){
     // Set viewing todolist
     $("#public tr").click(function(){
         selectedpublictdl = $(this);
+        selecttype = "public";
+        selectedtd = null;
         $.ajax({
         type:"GET",
         url: "/viewtodolist?type=public&index=" + $(this).children().eq(2).val(),
@@ -64,6 +69,8 @@ $(document).ready(function(){
     
     $("#private tr").click(function(){
         selectedprivatetdl = $(this);
+        selecttype = "private";
+        selectedtd = null;
         $.ajax({
         type:"GET",
         url: "/viewtodolist?type=private&index=" + $(this).children().eq(2).val(),
@@ -130,18 +137,20 @@ $(document).ready(function(){
     
     $("#RemovePublicToDoList").click(function(){
         $.get("/deletetodolist?type=public&index=" + selectedpublictdl.children().eq(2).val(), function(data){
-            if(data !== ""){
+            if(data === "ok"){
                 selectedpublictdl.remove();
                 selectedpublictdl = null;
+                selecttype = null;
             }
         });
     });
     
     $("#RemovePrivateToDoList").click(function(){
         $.get("/deletetodolist?type=private&index=" + selectedprivatetdl.children().eq(2).val(), function(data){
-            if(data !== ""){
+            if(data === "ok"){
                 selectedprivatetdl.remove();
                 selectedprivatetdl = null;
+                selecttype = null;
             }
         });
     });
@@ -151,8 +160,8 @@ $(document).ready(function(){
             if(data !== ""){
                 public.append(
                     "<tr>"
-                    + "<td>EMPTY</td>"
-                    + "<td>EMPTY</td>"
+                    + "<td></td>"
+                    + "<td></td>"
                     + "<input type='hidden' value='" + data + "'>"
                     + "</tr>");
             }
@@ -164,20 +173,50 @@ $(document).ready(function(){
             if(data !== ""){
                 private.append(
                     "<tr>"
-                    + "<td>EMPTY</td>"
-                    + "<td>EMPTY</td>"
+                    + "<td></td>"
+                    + "<td></td>"
                     + "<input type='hidden' value='" + data + "'>"
                     + "</tr>");
             }
         });
     });
     
+    $("#todolist tr").click(function(){
+        selectedtd = $(this);
+    });
+    
     $("#RemoveToDo").click(function(){
-        
+        if(selecttype !== null && selectedtd !== null){
+            $.get("/deletetodo?type=" + selecttype + "&index=" + (selecttype === "public"?
+                selectedpublictdl.children().eq(2).val():selectedprivatetdl.children().eq(2).val()) + "&index2="
+                + selectedtd.children().eq(5).val()
+                , function(data){
+                if(data === "ok"){
+                    selectedtd.remove();
+                    selectedtd = null;
+                }
+            });
+        }
     });
     
     $("#AddToDo").click(function(){
-        
+        if(selecttype !== null){
+            $.get("/addtodo?type=" + selecttype + "&index=" + (selecttype === "public"?
+                selectedpublictdl.children().eq(2).val():selectedprivatetdl.children().eq(2).val())
+                , function(data){
+                if(data !== ""){
+                    todolist.append(
+                            "<tr>"
+                            + "<td></td>"
+                            + "<td></td>"
+                            + "<td></td>"
+                            + "<td></td>"
+                            + "<td></td>"
+                            + "<input type='hidden' value='" + data + "'>"
+                            + "</tr>");
+                }
+            });
+        }
     });
     
 });

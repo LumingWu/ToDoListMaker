@@ -105,7 +105,7 @@ public class GuestbookController {
         return html;
     }
     
-    @RequestMapping(value="/deletetodolist", produces="text/html")
+    @RequestMapping(value="/deletetodolist", produces="text/plain")
     @ResponseBody
     public String deletetodolist(
             @ModelAttribute("public") ToDoList[] publictdl,
@@ -116,7 +116,7 @@ public class GuestbookController {
         return "ok";
     }
     
-    @RequestMapping(value="/addtodolist", produces="text/html")
+    @RequestMapping(value="/addtodolist", produces="text/plain")
     @ResponseBody
     public String addtodolist(
             @ModelAttribute("public") ToDoList[] publictdl,
@@ -124,6 +124,27 @@ public class GuestbookController {
             @RequestParam("type") String type){
         //Return '' if failed, index if success.
         return "3";
+    }
+    
+    @RequestMapping(value="/addtodo", produces="text/plain")
+    @ResponseBody
+    public String addtodo(
+            @ModelAttribute("public") ToDoList[] publictdl,
+            @ModelAttribute("private") ToDoList[] privatetdl,
+            @RequestParam("type") String type,
+            @RequestParam("index") int index){
+        return "3";
+    }
+    
+    @RequestMapping(value="/deletetodo", produces="text/plain")
+    @ResponseBody
+    public String deletetodo(
+            @ModelAttribute("public") ToDoList[] publictdl,
+            @ModelAttribute("private") ToDoList[] privatetdl,
+            @RequestParam("type") String type,
+            @RequestParam("index") int index,
+            @RequestParam("index2") int index2){
+        return "ok";
     }
     
     @RequestMapping("/sign")
