@@ -70,14 +70,15 @@ $(document).ready(function () {
                         var td = $(this).parent();
                         var value = $(this).val();
                         $(this).remove();
+                        td.text(value);
                         $.get("/modifytodo?type=" + selecttype + "&index=" + (selecttype === "public" ?
                                 selectedpublictdl.children().eq(2).val() : selectedprivatetdl.children().eq(2).val())
                                 + "&index2=" + selectedtd.children().eq(5).val()
-                                + "&category=" + tr.children().eq(0).val()
-                                + "&description=" + tr.children().eq(1).val()
-                                + "&startdate=" + tr.children().eq(2).val()
-                                + "&enddate=" + tr.children().eq(3).val()
-                                + "&complete=" + tr.children().eq(4).val()
+                                + "&category=" + tr.children().eq(0).text()
+                                + "&description=" + tr.children().eq(1).text()
+                                + "&startdate=" + tr.children().eq(2).text()
+                                + "&enddate=" + tr.children().eq(3).text()
+                                + "&complete=" + tr.children().eq(4).text()
                                 , function (data) {
                                     if (data === "ok") {
                                         td.text(value);
@@ -113,14 +114,15 @@ $(document).ready(function () {
                         var td = $(this).parent();
                         var value = $(this).val();
                         $(this).remove();
+                        td.text(value);
                         $.get("/modifytodo?type=" + selecttype + "&index=" + (selecttype === "public" ?
                                 selectedpublictdl.children().eq(2).val() : selectedprivatetdl.children().eq(2).val())
                                 + "&index2=" + selectedtd.children().eq(5).val()
-                                + "&category=" + tr.children().eq(0).val()
-                                + "&description=" + tr.children().eq(1).val()
-                                + "&startdate=" + tr.children().eq(2).val()
-                                + "&enddate=" + tr.children().eq(3).val()
-                                + "&complete=" + tr.children().eq(4).val()
+                                + "&category=" + tr.children().eq(0).text()
+                                + "&description=" + tr.children().eq(1).text()
+                                + "&startdate=" + tr.children().eq(2).text()
+                                + "&enddate=" + tr.children().eq(3).text()
+                                + "&complete=" + tr.children().eq(4).text()
                                 , function (data) {
                                     if (data === "ok") {
                                         td.text(value);
@@ -234,14 +236,15 @@ $(document).ready(function () {
                                     var td = $(this).parent();
                                     var value = $(this).val();
                                     $(this).remove();
+                                    td.text(value);
                                     $.get("/modifytodo?type=" + selecttype + "&index=" + (selecttype === "public" ?
                                             selectedpublictdl.children().eq(2).val() : selectedprivatetdl.children().eq(2).val())
                                             + "&index2=" + selectedtd.children().eq(5).val()
-                                            + "&category=" + tr.children().eq(0).val()
-                                            + "&description=" + tr.children().eq(1).val()
-                                            + "&startdate=" + tr.children().eq(2).val()
-                                            + "&enddate=" + tr.children().eq(3).val()
-                                            + "&complete=" + tr.children().eq(4).val()
+                                            + "&category=" + tr.children().eq(0).text()
+                                            + "&description=" + tr.children().eq(1).text()
+                                            + "&startdate=" + tr.children().eq(2).text()
+                                            + "&enddate=" + tr.children().eq(3).text()
+                                            + "&complete=" + tr.children().eq(4).text()
                                             , function (data) {
                                                 if (data === "ok") {
                                                     td.text(value);
@@ -261,8 +264,9 @@ $(document).ready(function () {
                         var td = $(this).parent();
                         var value = $(this).val();
                         $(this).remove();
+                        td.text(value);
                         $.get("/modifytodolist?type=public&index=" + selectedpublictdl.children().eq(2).val()
-                                + "&name=" + tr.children().eq(0).val() + "&owner=" + tr.children().eq(1).val
+                                + "&name=" + tr.children().eq(0).text() + "&owner=" + tr.children().eq(1).text()
                                 , function (data) {
                                     if (data === "ok") {
                                         td.text(value);
@@ -307,14 +311,15 @@ $(document).ready(function () {
                                     var td = $(this).parent();
                                     var value = $(this).val();
                                     $(this).remove();
+                                    td.text(value);
                                     $.get("/modifytodo?type=" + selecttype + "&index=" + (selecttype === "public" ?
                                             selectedpublictdl.children().eq(2).val() : selectedprivatetdl.children().eq(2).val())
                                             + "&index2=" + selectedtd.children().eq(5).val()
-                                            + "&category=" + tr.children().eq(0).val()
-                                            + "&description=" + tr.children().eq(1).val()
-                                            + "&startdate=" + tr.children().eq(2).val()
-                                            + "&enddate=" + tr.children().eq(3).val()
-                                            + "&complete=" + tr.children().eq(4).val()
+                                            + "&category=" + tr.children().eq(0).text()
+                                            + "&description=" + tr.children().eq(1).text()
+                                            + "&startdate=" + tr.children().eq(2).text()
+                                            + "&enddate=" + tr.children().eq(3).text()
+                                            + "&complete=" + tr.children().eq(4).text()
                                             , function (data) {
                                                 if (data === "ok") {
                                                     td.text(value);
@@ -334,8 +339,9 @@ $(document).ready(function () {
                         var td = $(this).parent();
                         var value = $(this).val();
                         $(this).remove();
+                        td.text(value);
                         $.get("/modifytodolist?type=private&index=" + selectedprivatetdl.children().eq(2).val()
-                                + "&name=" + tr.children().eq(0).val() + "&owner=" + tr.children().eq(1).val()
+                                + "&name=" + tr.children().eq(0).text() + "&owner=" + tr.children().eq(1).text()
                                 , function (data) {
                                     if (data === "ok") {
                                         td.text(value);
@@ -382,7 +388,7 @@ $(document).ready(function () {
                                     + "<td></td>"
                                     + "<input type='hidden' value='" + data + "'>"
                                     + "</tr>");
-                            $("#todolist tr").click(function () {
+                            todolist.children("tr").click(function () {
                                 selectedtd = $(this);
                             });
                             $("#todolist tr td").dblclick(function () {
@@ -392,14 +398,15 @@ $(document).ready(function () {
                                     var td = $(this).parent();
                                     var value = $(this).val();
                                     $(this).remove();
+                                    td.text(value);
                                     $.get("/modifytodo?type=" + selecttype + "&index=" + (selecttype === "public" ?
                                             selectedpublictdl.children().eq(2).val() : selectedprivatetdl.children().eq(2).val())
                                             + "&index2=" + selectedtd.children().eq(5).val()
-                                            + "&category=" + tr.children().eq(0).val()
-                                            + "&description=" + tr.children().eq(1).val()
-                                            + "&startdate=" + tr.children().eq(2).val()
-                                            + "&enddate=" + tr.children().eq(3).val()
-                                            + "&complete=" + tr.children().eq(4).val()
+                                            + "&category=" + tr.children().eq(0).text()
+                                            + "&description=" + tr.children().eq(1).text()
+                                            + "&startdate=" + tr.children().eq(2).text()
+                                            + "&enddate=" + tr.children().eq(3).text()
+                                            + "&complete=" + tr.children().eq(4).text()
                                             , function (data) {
                                                 if (data === "ok") {
                                                     td.text(value);
@@ -421,8 +428,9 @@ $(document).ready(function () {
             var td = $(this).parent();
             var value = $(this).val();
             $(this).remove();
+            td.text(value);
             $.get("/modifytodolist?type=public&index=" + selectedpublictdl.children().eq(2).val()
-                    + "&name=" + tr.children().eq(0).val() + "&owner=" + tr.children().eq(1).val
+                    + "&name=" + tr.children().eq(0).text() + "&owner=" + tr.children().eq(1).text()
                     , function (data) {
                         if (data === "ok") {
                             td.text(value);
@@ -440,8 +448,9 @@ $(document).ready(function () {
             var td = $(this).parent();
             var value = $(this).val();
             $(this).remove();
+            td.text(value);
             $.get("/modifytodolist?type=private&index=" + selectedprivatetdl.children().eq(2).val()
-                    + "&name=" + tr.children().eq(0).val() + "&owner=" + tr.children().eq(1).val()
+                    + "&name=" + tr.children().eq(0).text() + "&owner=" + tr.children().eq(1).text()
                     , function (data) {
                         if (data === "ok") {
                             td.text(value);
@@ -459,14 +468,15 @@ $(document).ready(function () {
             var td = $(this).parent();
             var value = $(this).val();
             $(this).remove();
+            td.text(value);
             $.get("/modifytodo?type=" + selecttype + "&index=" + (selecttype === "public" ?
                     selectedpublictdl.children().eq(2).val() : selectedprivatetdl.children().eq(2).val())
                     + "&index2=" + selectedtd.children().eq(5).val()
-                    + "&category=" + tr.children().eq(0).val()
-                    + "&description=" + tr.children().eq(1).val()
-                    + "&startdate=" + tr.children().eq(2).val()
-                    + "&enddate=" + tr.children().eq(3).val()
-                    + "&complete=" + tr.children().eq(4).val()
+                    + "&category=" + tr.children().eq(0).text()
+                    + "&description=" + tr.children().eq(1).text()
+                    + "&startdate=" + tr.children().eq(2).text()
+                    + "&enddate=" + tr.children().eq(3).text()
+                    + "&complete=" + tr.children().eq(4).text()
                     , function (data) {
                         if (data === "ok") {
                             td.text(value);
